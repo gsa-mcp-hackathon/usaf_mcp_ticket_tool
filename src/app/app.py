@@ -110,12 +110,12 @@ def get_db_connection():
 
 
 def get_andoff_context(limit=MAX_DB_CONTEXT_ROWS):
-    """Fetches recent AndOff issues from Unity Catalog for the AI Assistant."""
+    """Fetches recent AndOff issues from Unity Catalog for the AI Assistant, including Status."""
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(f"""
-                    SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum
+                    SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, Status
                     FROM {ISSUES_TABLE}
                     ORDER BY PriorityRank ASC, IssueId DESC
                     LIMIT {int(limit)}
@@ -126,7 +126,7 @@ def get_andoff_context(limit=MAX_DB_CONTEXT_ROWS):
                 lines = []
                 for r in rows:
                     lines.append(
-                        f"- {r[0]} | Org: {r[1]} | Type: {r[2]} ({r[3]}) | Priority: {r[4]} | Part: {r[6]} | Desc: {r[5]}"
+                        f"- {r[0]} | Org: {r[1]} | Type: {r[2]} ({r[3]}) | Priority: {r[4]} | Status: {r[7]} | Part: {r[6]} | Desc: {r[5]}"
                     )
                 return "\n".join(lines)
     except Exception as e:
@@ -146,7 +146,7 @@ def ask_databricks_agent(prompt_text, model_id="gpt-5-6-terra", chat_history=Non
     system_instruction = (
         "You are an USAF AndOff Aircraft Maintenance AI Assistant running on Databricks. "
         "You help maintenance teams analyze open aircraft issues, prioritize blockers (PriorityRank 1 = highest), "
-        "and recommend troubleshooting or workarounds.\n\n"
+        "track issue status, and recommend troubleshooting or workarounds.\n\n"
         f"Below are the current AndOff issues from {ISSUES_TABLE}:\n"
         f"{db_context}\n\n"
         "Answer the user's prompt clearly and concisely."
@@ -221,14 +221,14 @@ def ask_databricks_agent(prompt_text, model_id="gpt-5-6-terra", chat_history=Non
 
 @app.route('/')
 def home():
-    """Renders the dark-mode AndOff Dashboard & 5-Step Wizard UI."""
+    """Renders the dark-mode AndOff Dashboard & 5-Step Wizard UI with Status included."""
     issues, orgs, users = [], [], []
     db_status = "Connected"
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(f"""
-                    SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, IssuePoc, IssuePocEmail
+                    SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, IssuePoc, IssuePocEmail, Status
                     FROM {ISSUES_TABLE}
                     ORDER BY PriorityRank ASC, IssueId DESC
                     LIMIT 100
@@ -237,7 +237,8 @@ def home():
                     {
                         "IssueId": r[0], "OrgId": r[1], "IssueTypeId": r[2],
                         "SubIssueType": r[3], "PriorityRank": r[4], "IssueDesc": r[5],
-                        "PartNum": r[6], "IssuePoc": r[7], "IssuePocEmail": r[8]
+                        "PartNum": r[6], "IssuePoc": r[7], "IssuePocEmail": r[8],
+                        "Status": r[9] if r[9] is not None else "Open"
                     }
                     for r in cursor.fetchall()
                 ]
@@ -281,13 +282,13 @@ def home():
 
 @app.route('/api/issues', methods=['GET', 'POST'])
 def api_issues():
-    """GET: List AndOff issues | POST: Create a new AndOff issue from the 5-Step Wizard."""
+    """GET: List AndOff issues with Status | POST: Create a new AndOff issue with Status."""
     if request.method == 'GET':
         try:
             with get_db_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(f"""
-                        SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, IssuePoc, IssuePocEmail
+                        SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, IssuePoc, IssuePocEmail, Status
                         FROM {ISSUES_TABLE}
                         ORDER BY PriorityRank ASC, IssueId DESC
                         LIMIT 100
@@ -297,7 +298,8 @@ def api_issues():
                         {
                             "IssueId": r[0], "OrgId": r[1], "IssueTypeId": r[2],
                             "SubIssueType": r[3], "PriorityRank": r[4], "IssueDesc": r[5],
-                            "PartNum": r[6], "IssuePoc": r[7], "IssuePocEmail": r[8]
+                            "PartNum": r[6], "IssuePoc": r[7], "IssuePocEmail": r[8],
+                            "Status": r[9] if r[9] is not None else "Open"
                         }
                         for r in rows
                     ])
@@ -315,6 +317,7 @@ def api_issues():
     part_num = data.get("PartNum", "")
     issue_poc = data.get("IssuePoc", "")
     issue_poc_email = data.get("IssuePocEmail") or get_logged_in_user_email()
+    status = data.get("Status", "Open")
 
     try:
         with get_db_connection() as conn:
@@ -322,12 +325,12 @@ def api_issues():
                 cursor.execute(
                     f"""
                     INSERT INTO {ISSUES_TABLE}
-                    (IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, IssuePoc, IssuePocEmail, _rescued_data)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+                    (IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, IssuePoc, IssuePocEmail, Status, _rescued_data)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
                     """,
-                    [issue_id, org_id, issue_type, sub_issue_type, priority_rank, issue_desc, part_num, issue_poc, issue_poc_email]
+                    [issue_id, org_id, issue_type, sub_issue_type, priority_rank, issue_desc, part_num, issue_poc, issue_poc_email, status]
                 )
-        return jsonify({"status": "created", "IssueId": issue_id}), 201
+        return jsonify({"status": "created", "IssueId": issue_id, "issue_status": status}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -398,22 +401,23 @@ def query_catalog_table(query: str) -> str:
 
 @mcp_server.tool()
 def get_andoff_issues(limit: int = 20) -> str:
-    """Get AndOff aircraft maintenance issues ordered by PriorityRank."""
+    """Get AndOff aircraft maintenance issues ordered by PriorityRank, including Status."""
     return _run_mcp_sql(
-        f"SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, IssuePoc "
+        f"SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, Status, IssueDesc, PartNum, IssuePoc "
         f"FROM {ISSUES_TABLE} ORDER BY PriorityRank ASC, IssueId DESC LIMIT {int(limit)}"
     )
 
 
 @mcp_server.tool()
 def search_andoff_issues(keyword: str) -> str:
-    """Search AndOff issues by keyword in IssueDesc, IssueTypeId, SubIssueType, or PartNum."""
+    """Search AndOff issues by keyword in IssueDesc, IssueTypeId, SubIssueType, PartNum, or Status."""
     safe_kw = keyword.replace("'", "''")
     return _run_mcp_sql(
-        f"SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, IssuePoc "
+        f"SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, Status, IssueDesc, PartNum, IssuePoc "
         f"FROM {ISSUES_TABLE} "
         f"WHERE IssueDesc ILIKE '%{safe_kw}%' OR IssueTypeId ILIKE '%{safe_kw}%' "
         f"OR SubIssueType ILIKE '%{safe_kw}%' OR PartNum ILIKE '%{safe_kw}%' "
+        f"OR Status ILIKE '%{safe_kw}%' "
         f"ORDER BY PriorityRank ASC LIMIT 25"
     )
 
