@@ -1,0 +1,432 @@
+/* ==========================================================================
+   USAF Flight Ready Assessment Tool - Complete Custom Stylesheet (Option A)
+   Design: Minimalist Floating White Cards + Bottom-Border Inputs +
+           Pill Gradient Buttons + USAF Fighter Aircraft Background +
+           Interactive AI Chat with Language Model Selector
+   ========================================================================== */
+
+:root {
+    --usaf-navy: #071426;
+    --usaf-deep-blue: #0c2340;
+    --usaf-royal-blue: #00308f;
+    --usaf-sky-blue: #0072ce;
+    --usaf-cyan: #00b4d8;
+    --usaf-silver: #a2aaad;
+    --text-dark: #222222;
+    --text-muted: #888888;
+    --border-light: #e2e8f0;
+    --card-radius: 14px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    color: var(--text-dark);
+    background-color: var(--usaf-deep-blue);
+    background-image:
+        linear-gradient(135deg, rgba(6, 17, 33, 0.35) 0%, rgba(12, 35, 64, 0.35) 100%),
+        url("/static/images/flightimage1105.jpg");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding: 40px 20px 60px;
+}
+
+/* ==========================================================================
+   Header Banner
+   ========================================================================== */
+.app-header {
+    text-align: center;
+    color: #ffffff;
+    margin-bottom: 36px;
+}
+
+.usaf-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--usaf-cyan);
+    background: rgba(0, 180, 216, 0.12);
+    border: 1px solid rgba(0, 180, 216, 0.35);
+    padding: 6px 16px;
+    border-radius: 50px;
+    margin-bottom: 12px;
+}
+
+.app-header h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    margin-bottom: 8px;
+}
+
+.app-header p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.82);
+    font-weight: 400;
+}
+
+/* ==========================================================================
+   Floating White Cards 
+   ========================================================================== */
+.main-wrapper {
+    max-width: 1060px;
+    margin: 0 auto;
+}
+
+.clean-card {
+    background: #ffffff;
+    border-radius: var(--card-radius);
+    padding: 44px 40px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    border: none;
+    height: 100%;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-title-hero {
+    font-size: 1.95rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    text-align: center;
+    margin-bottom: 36px;
+    letter-spacing: -0.5px;
+}
+
+/* ==========================================================================
+   Minimalist Bottom-Border Form Inputs & Dropdowns 
+   ========================================================================== */
+.input-group-minimal {
+    position: relative;
+    margin-bottom: 28px;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 6px;
+    transition: border-color 0.3s ease;
+}
+
+/* Animated bottom underline on focus */
+.input-group-minimal::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--usaf-royal-blue), var(--usaf-cyan));
+    transition: width 0.35s ease;
+}
+
+.input-group-minimal:focus-within::after {
+    width: 100%;
+}
+
+.minimal-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+}
+
+.minimal-input,
+.minimal-select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 1.02rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    padding: 6px 0;
+    box-shadow: none !important;
+}
+
+.minimal-input::placeholder {
+    color: #c0c4cc;
+    font-weight: 400;
+}
+
+.minimal-select {
+    cursor: pointer;
+}
+
+/* Model Selector specific styling in Chat Header */
+.model-selector-group {
+    background: #f8fafc;
+    padding: 8px 14px 6px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 2px solid #cbd5e1;
+}
+
+.model-selector-group .minimal-select {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--usaf-royal-blue);
+}
+
+/* ==========================================================================
+   Pill-Shaped Gradient Submit Button 
+   ========================================================================== */
+.btn-gradient-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 50px;
+    /* USAF Afterburner Blue-to-Cyan Gradient */
+    background: linear-gradient(90deg, #00308f 0%, #0072ce 50%, #00b4d8 100%);
+    background-size: 200% auto;
+    color: #ffffff;
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(0, 114, 206, 0.35);
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-pill:hover {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(0, 180, 216, 0.45);
+    color: #ffffff;
+}
+
+.btn-gradient-pill:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-gradient-pill .arrow {
+    margin-left: 10px;
+    font-size: 1.15rem;
+    transition: transform 0.25s ease;
+}
+
+.btn-gradient-pill:hover .arrow {
+    transform: translateX(5px);
+}
+
+/* ==========================================================================
+   Right Column: Verdict & Checklist Styling
+   ========================================================================== */
+.verdict-banner {
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.verdict-go {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #6ee7b7;
+    color: #065f46;
+}
+
+.verdict-nogo {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+}
+
+.verdict-code {
+    font-size: 3.3rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+
+.verdict-subtitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.checklist-heading {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.minimal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.minimal-table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    border-bottom: 2px solid #edf2f7;
+    padding: 10px 8px;
+    text-align: left;
+}
+
+.minimal-table td {
+    padding: 13px 8px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.92rem;
+    color: var(--text-dark);
+}
+
+.status-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.status-pass {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-fail {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.empty-state-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 360px;
+    color: var(--text-muted);
+}
+
+.empty-state-icon {
+    font-size: 3.2rem;
+    margin-bottom: 16px;
+    opacity: 0.75;
+}
+
+/* ==========================================================================
+   Bottom Panel: Interactive AI Chat Box (Matched to Minimalist Card Theme)
+   ========================================================================== */
+.chat-card {
+    padding: 34px 40px;
+}
+
+.chat-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.3px;
+}
+
+.chat-window {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    height: 290px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.chat-bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 0.94rem;
+    line-height: 1.5;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.ai-bubble {
+    align-self: flex-start;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: var(--text-dark);
+    border-bottom-left-radius: 4px;
+}
+
+.user-bubble {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #00308f 0%, #0072ce 100%);
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+}
+
+.bubble-sender {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+    opacity: 0.75;
+}
+
+.bubble-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.typing-bubble {
+    opacity: 0.75;
+    font-style: italic;
+}
+
+.error-bubble {
+    border-color: #fca5a5;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.chat-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+}
+
+.chat-input-wrapper {
+    flex: 1;
+}
+
+.chat-pill-btn {
+    width: auto;
+    min-width: 155px;
+    margin-top: 0;
+    padding: 12px 26px;
+}
+
+@media (max-width: 576px) {
+    .clean-card,
+    .chat-card {
+        padding: 28px 22px;
+    }
+    .chat-input-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .chat-pill-btn {
+        width: 100%;
+    }
+}
