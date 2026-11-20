@@ -19,6 +19,17 @@ from databricks.sdk.service.sql import StatementState
 from databricks.sdk.service.serving import ChatMessage, ChatMessageRole
 
 app = Flask(__name__)
+
+# Load .env from the same directory as app.py (no external packages required)
+_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+if os.path.exists(_env_path):
+    with open(_env_path, "r", encoding="utf-8") as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _v = _line.split("=", 1)
+                os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
+
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "andoff-hackathon-session-key-72asx")
 
 # --- Context Window & Table Configuration ---
@@ -29,7 +40,6 @@ MAX_OUTPUT_TOKENS = 4096
 ISSUES_TABLE = "workspace.default.databricks_issue_import_filtered"
 ORGS_TABLE = "workspace.default.t_org_list"
 USERS_TABLE = "workspace.default.t_user_accounts"
-
 CHAT_STORE_FILE = os.path.join(tempfile.gettempdir(), "andoff_chat_sessions.json")
 
 
@@ -83,7 +93,12 @@ def get_server_hostname():
 
 
 def get_pat_token():
-    return os.environ.get("DATABRICKS_TOKEN", "dapi9bf2ab2809f9bcc81d422793282ac58b")
+    token = os.environ.get("DATABRICKS_TOKEN")
+    if not token:
+        raise RuntimeError(
+            "DATABRICKS_TOKEN is not set. Add it to the .env file in the same folder as app.py."
+        )
+    return token
 
 
 def get_warehouse_id():
@@ -136,7 +151,6 @@ def get_andoff_context(limit=MAX_DB_CONTEXT_ROWS):
 def ask_databricks_agent(prompt_text, model_id="gpt-5-6-terra", chat_history=None):
     if model_id not in VALID_MODEL_IDS:
         model_id = "gpt-5-6-terra"
-
     server_hostname = get_server_hostname()
     pat_token = get_pat_token()
     unity_gateway_model = f"system.ai.{model_id}"
@@ -242,10 +256,8 @@ def home():
                     }
                     for r in cursor.fetchall()
                 ]
-
                 cursor.execute(f"SELECT OrgId, Org, OrgDesc FROM {ORGS_TABLE} ORDER BY OrgId ASC")
                 orgs = [{"OrgId": r[0], "Org": r[1], "OrgDesc": r[2]} for r in cursor.fetchall()]
-
                 cursor.execute(f"""
                     SELECT UserAccountId, DisplayName, Email, Role, OrgId, CreatedDate, IsActive
                     FROM {USERS_TABLE}
@@ -267,7 +279,6 @@ def home():
         (u for u in users if u["Email"] and u["Email"].lower() == user_email.lower()),
         {"DisplayName": user_email, "Email": user_email, "Role": "User", "OrgId": 1}
     )
-
     return render_template(
         'index.html',
         issues=issues,
@@ -340,7 +351,6 @@ def chat_with_agent():
     data = request.get_json(silent=True) or {}
     model_id = data.get('model') or request.form.get('model', 'gpt-5-6-terra')
     user_prompt = (data.get('prompt') or request.form.get('prompt', '')).strip()
-
     if not user_prompt:
         return jsonify({"error": "Please enter a prompt for the agent."}), 400
 
@@ -358,7 +368,6 @@ def chat_with_agent():
 
     chat_history = load_chat_history(session_id)
     reply = ask_databricks_agent(prompt_text=user_prompt, model_id=model_id, chat_history=chat_history)
-
     chat_history.append({"role": "user", "content": user_prompt})
     chat_history.append({"role": "assistant", "content": str(reply)})
     save_chat_history(session_id, chat_history)

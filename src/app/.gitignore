@@ -1,0 +1,9 @@
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Python cache & temporary files
+__pycache__/
+*.py[cod]
+*.log
