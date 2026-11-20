@@ -111,6 +111,9 @@ def get_warehouse_id():
     if not warehouse_id:
         raise RuntimeError(
             "DATABRICKS_WAREHOUSE_ID is not set. Add it to the .env file in the same folder as app.py."
+        )
+    return warehouse_id
+
 
 
 def get_logged_in_user_email():
