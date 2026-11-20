@@ -153,6 +153,21 @@
             border-radius: 8px;
             padding: 0.85rem;
         }
+        .form-control-dark::placeholder {
+            color: #8b949e !important;
+            opacity: 0.85 !important;
+        }
+
+        .form-control-dark::-webkit-input-placeholder {
+            color: #8b949e !important;
+            opacity: 0.85 !important;
+        }
+
+        .form-control-dark::-moz-placeholder {
+            color: #8b949e !important;
+            opacity: 0.85 !important;
+        }
+
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -349,7 +364,7 @@
                             <div class="text-secondary">Ask about open AndOff tickets, Priority 1 blockers, part numbers, or organizations...</div>
                         </div>
                         <form id="chatForm" class="d-flex gap-2">
-                            <input type="text" id="chatInput" class="form-control form-control-dark" placeholder="e.g., Summarize all Priority 1 mechanical or fuel leak issues..." required>
+                            <input type="text" id="chatInput" class="form-control form-control-dark" placeholder="e.g., Summarize all Priority 1 mechanical or fuel leak issues..." autocomplete="off" required>
                             <button type="submit" class="btn btn-primary px-4">Send</button>
                         </form>
                     </div>
