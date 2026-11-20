@@ -115,7 +115,6 @@ def get_warehouse_id():
     return warehouse_id
 
 
-
 def get_logged_in_user_email():
     """Returns the authenticated user's email from Databricks Apps reverse-proxy headers."""
     return (
@@ -377,6 +376,13 @@ def chat_with_agent():
             "response": "Conversation history has been cleared. How can I help you with AndOff issues?"
         })
 
+    if "send_tier1_sql_alert" in user_prompt.lower() or "send tier 1 alert" in user_prompt.lower():
+        alert_result = send_tier1_sql_alert()
+        return jsonify({
+            "model": f"databricks-{model_id}",
+            "response": alert_result
+        })
+
     chat_history = load_chat_history(session_id)
     reply = ask_databricks_agent(prompt_text=user_prompt, model_id=model_id, chat_history=chat_history)
     chat_history.append({"role": "user", "content": user_prompt})
@@ -454,6 +460,35 @@ def get_user_accounts() -> str:
     return _run_mcp_sql(
         f"SELECT UserAccountId, DisplayName, Email, Role, OrgId FROM {USERS_TABLE} WHERE IsActive = 1 ORDER BY DisplayName ASC"
     )
+
+
+@mcp_server.tool()
+def send_tier1_sql_alert(job_id: str = "") -> str:
+    """Trigger the Databricks Job to evaluate the Tier 1 SQL Alert and send email notifications."""
+    target_job_id = job_id.strip() or os.environ.get("DATABRICKS_JOB_ID")
+    if not target_job_id:
+        return "Error: DATABRICKS_JOB_ID is not set in .env and no job_id was provided."
+
+    url = f"https://{get_server_hostname()}/api/2.1/jobs/run-now"
+    payload = json.dumps({"job_id": int(target_job_id)}).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {get_pat_token()}"
+        },
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            return f"Successfully triggered Tier 1 SQL Alert Job (run_id: {data.get('run_id')}). Email will be sent if Tier 1 tickets are open."
+    except Exception as e:
+        return f"Failed to trigger Job ({target_job_id}): {e}"
+
+
+
 
 
 # =====================================================================
