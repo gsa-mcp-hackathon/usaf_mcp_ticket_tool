@@ -30,7 +30,7 @@ if os.path.exists(_env_path):
                 _k, _v = _line.split("=", 1)
                 os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
 
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "andoff-hackathon-session-key-72asx")
+app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 
 # --- Context Window & Table Configuration ---
 MAX_HISTORY_MESSAGES = 100
@@ -89,7 +89,12 @@ VALID_MODEL_IDS = {m["id"] for m in AVAILABLE_MODELS}
 
 
 def get_server_hostname():
-    return os.environ.get("DATABRICKS_HOST", "dbc-aae0ba16-8727.cloud.databricks.com").replace("https://", "").strip("/")
+    host = os.environ.get("DATABRICKS_HOST")
+    if not host:
+        raise RuntimeError(
+            "DATABRICKS_HOST is not set. Add it to the .env file in the same folder as app.py."
+        )
+    return host.replace("https://", "").strip("/")
 
 
 def get_pat_token():
@@ -102,7 +107,10 @@ def get_pat_token():
 
 
 def get_warehouse_id():
-    return os.environ.get("DATABRICKS_WAREHOUSE_ID", "50d2bd4ddf65e0f5")
+    warehouse_id = os.environ.get("DATABRICKS_WAREHOUSE_ID")
+    if not warehouse_id:
+        raise RuntimeError(
+            "DATABRICKS_WAREHOUSE_ID is not set. Add it to the .env file in the same folder as app.py."
 
 
 def get_logged_in_user_email():
