@@ -78,11 +78,6 @@ AVAILABLE_MODELS = [
     {"id": "gpt-5-6-terra", "label": "GPT-5.6 Terra (databricks-gpt-5-6-terra)"},
     {"id": "gpt-5-6-luna", "label": "GPT-5.6 Luna (databricks-gpt-5-6-luna)"},
     {"id": "grok-4-6", "label": "Grok 4.6 (databricks-grok-4-6)"},
-    {"id": "gemini-3-8-flash", "label": "Gemini 3.8 Flash (databricks-gemini-3-8-flash)"},
-    {"id": "gemini-3-7-flash", "label": "Gemini 3.7 Flash (databricks-gemini-3-7-flash)"},
-    {"id": "gemini-3-6-flash", "label": "Gemini 3.6 Flash (databricks-gemini-3-6-flash)"},
-    {"id": "gemini-3-5-flash", "label": "Gemini 3.5 Flash (databricks-gemini-3-5-flash)"},
-    {"id": "gemini-3-5-flash-lite", "label": "Gemini 3.5 Flash Lite (databricks-gemini-3-5-flash-lite)"},
     {"id": "gpt-5-4", "label": "GPT-5.4 (databricks-gpt-5-4)"}
 ]
 VALID_MODEL_IDS = {m["id"] for m in AVAILABLE_MODELS}
@@ -140,7 +135,7 @@ def get_andoff_context(limit=MAX_DB_CONTEXT_ROWS):
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(f"""
-                    SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, Status
+                    SELECT IssueId, OrgId, IssueTypeId, SubIssueType, PriorityRank, IssueDesc, PartNum, Status, IssuePoc, IssuePocEmail
                     FROM {ISSUES_TABLE}
                     ORDER BY PriorityRank ASC, IssueId DESC
                     LIMIT {int(limit)}
