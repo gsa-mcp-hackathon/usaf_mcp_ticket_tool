@@ -2,7 +2,7 @@
 
 A unified **Flask + FastAPI + FastMCP** application built for the GSA Hackathon to explore **Model Context Protocol (MCP)** server functionality on Databricks Apps.
 
-It pairs a dark-mode **AndOff Issue Tracking Dashboard & AI Assistant** (`/`) with a **Streamable HTTP MCP Server** (`/mcp`) so AI agents can query and search Unity Catalog maintenance data directly.
+It pairs a dark-mode **AndOff Issue Tracking Dashboard & AI Assistant** (`/`) with a **Streamable HTTP MCP Server** (`/mcp`) so AI agents can query, search, and trigger alerts on Unity Catalog maintenance data directly.
 
 ---
 
@@ -15,7 +15,7 @@ It pairs a dark-mode **AndOff Issue Tracking Dashboard & AI Assistant** (`/`) wi
   - `workspace.default.databricks_issue_import_filtered`
   - `workspace.default.t_org_list`
   - `workspace.default.t_user_accounts`
-- **AI Assistant (`/chat`)**: Supports Databricks Model Serving & AI Gateway models (`gpt-5-6-terra`, `gpt-5-6-luna`, `grok-4-6`, `gemini-3-8-flash`, etc.) with live Unity Catalog issue context.
+- **AI Assistant (`/chat`)**: Supports Databricks Model Serving & AI Gateway models (`gpt-5-6-terra`, `gpt-5-6-luna`, `grok-4-6`, `gemini-3-8-flash`, etc.) with live Unity Catalog issue context and direct Tier 1 alert triggering.
 
 ---
 
@@ -30,6 +30,7 @@ AI agents connecting to `/mcp` can invoke the following tools:
 | `search_andoff_issues(keyword)` | Search issues by keyword across `IssueDesc`, `IssueTypeId`, `SubIssueType`, `PartNum`, or `Status`. |
 | `get_organizations()` | List all organizations from `t_org_list`. |
 | `get_user_accounts()` | List active user accounts and roles from `t_user_accounts`. |
+| `send_tier1_sql_alert(job_id="")` | Trigger the Databricks Job (`DATABRICKS_JOB_ID`) to evaluate the Tier 1 SQL Alert and send email notifications. |
 
 ---
 
@@ -43,3 +44,4 @@ src/app/
 ├── requirements.txt    # Python dependencies
 ├── static/             # Static assets
 └── templates/          # Flask HTML templates (index.html)
+
