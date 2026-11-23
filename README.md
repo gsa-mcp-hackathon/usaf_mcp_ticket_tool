@@ -15,7 +15,7 @@ It pairs a dark-mode **AndOff Issue Tracking Dashboard & AI Assistant** (`/`) wi
   - `workspace.default.databricks_issue_import_filtered`
   - `workspace.default.t_org_list`
   - `workspace.default.t_user_accounts`
-- **AI Assistant (`/chat`)**: Supports Databricks Model Serving & AI Gateway models (`gpt-5-6-terra`, `gpt-5-6-luna`, `grok-4-6`, `gemini-3-8-flash`, etc.) with live Unity Catalog issue context and direct Tier 1 alert triggering.
+- **AI Assistant (`/chat`)**: Supports Databricks Model Serving & AI Gateway models (`gpt-5-6-terra`, `gpt-5-6-luna`, `grok-4-6`, etc.) with live Unity Catalog issue context and direct Tier 1 alert triggering.
 
 ---
 
